@@ -38,6 +38,11 @@ public class Colony implements Identifiable {
         this.riskFactor = riskFactor;
     }
 
+    @Override
+    public long getId() {
+        return colony_id;
+    }
+
     // TODO: add resources to the inventory
     public void addResource(String key, int amount) {}
 
