@@ -56,5 +56,5 @@ public class Colony implements Identifiable {
     public Map viewInventory() { return Map.of(); }
 
     // TODO: create a trade request asking for a specific resource and the amount
-    public TradeRequest createTradeRequest(String key, int amount) { return TradeRequest; }
+    public TradeRequest createTradeRequest(String key, int amount) { return new TradeRequest(this, key, amount); }
 }
