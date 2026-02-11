@@ -7,5 +7,15 @@ public class Medicine extends Resource {
         this.type = type;
     }
 
+    // Copy constructor
+    public Medicine(Medicine other) {
+        super(other.getName(), other.getAmount());
+    }
+
+    @Override
+    public Resource copy() {
+        return new Medicine(this);
+    }
+
     public String getType(){ return type; }
 }
