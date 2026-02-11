@@ -11,4 +11,22 @@ public abstract class Resource {
     public int getAmount(){ return amount; }
 
     public String getName(){ return name; }
+
+    public abstract Resource copy();
+
+    // Add resources to resource amount
+    public void addAmount(int amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("Cannot add negative amount");
+        }
+        this.amount += amount;
+    }
+
+    // Remove resources from resource amount
+    public void removeAmount(int amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("Cannot remove negative amount");
+        }
+        this.amount -= amount;
+    }
 }
