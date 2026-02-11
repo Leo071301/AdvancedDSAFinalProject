@@ -1,4 +1,6 @@
 import java.awt.geom.Point2D;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Colony implements Identifiable {
@@ -6,7 +8,7 @@ public class Colony implements Identifiable {
     private String name;
     private final Point2D location;
     private int riskFactor; // 1-5: 1 safest and 5 the most dangerous
-    private HashMap<String, Resource> inventory;
+    private HashMap<String, Resource> inventory = new HashMap<>();
 
     public Colony(String colony_id, String name, Point2D location, int riskFactor) {
         if (colony_id == null) {
@@ -38,6 +40,9 @@ public class Colony implements Identifiable {
     }
 
     public void setRiskFactor(int riskFactor) {
+        if  (riskFactor < 1 || riskFactor > 5) {
+            throw new IllegalArgumentException("Risk factor must be between 1 and 5");
+        }
         this.riskFactor = riskFactor;
     }
 
@@ -46,18 +51,60 @@ public class Colony implements Identifiable {
         return colony_id;
     }
 
-    // TODO: add resources to the inventory
-    public void addResource(String key, int amount) {}
+    // Add resources to the inventory
+    public void addResource(Resource resource) {
+        String key = generateKey(resource);
+        if (inventory.containsKey(key)) { // Add the resource to inventory if it is already in the inventory
+            inventory.get(key).addAmount(resource.getAmount());
+        } else { // Put the resource in inventory
+            inventory.put(key, resource.copy());
+        }
+    }
 
-    // TODO: remove resources from the inventory
-    public void removeResource(String key, int amount) {}
+    // Remove resources from the inventory
+    public void removeResource(Resource resource) {
+        String key = generateKey(resource);
 
-    // TODO: check whether the colony's inventory contains a resource and how much of it
-    public boolean hasResource(String key, int amount) { return false; }
+        if (!inventory.containsKey(key)) {
+            throw new IllegalArgumentException(resource + " does not exist!");
+        }
 
-    // TODO: return a Map of inventory (view-only, use Collections.unmodifiable)
-    public Map viewInventory() { return Map.of(); }
+        Resource existing = inventory.get(key);
 
-    // TODO: create a trade request asking for a specific resource and the amount
-    public TradeRequest createTradeRequest(String key, int amount) { return new TradeRequest(this, key, amount); }
+        if (resource.getAmount() >= existing.getAmount()) {
+            // Remove the resource entirely if requested amount >= stored amount
+            inventory.remove(key);
+        } else {
+            // Otherwise, just decrease the amount
+            existing.removeAmount(resource.getAmount());
+        }
+    }
+
+    // Check whether the colony's inventory contains at least "amount" of that resource
+    public boolean hasResource(Resource resource, int amount) {
+        String key = generateKey(resource);
+        Resource existing = inventory.get(key);
+        return existing != null && existing.getAmount() >= amount;
+    }
+
+    // Return a fully safe, read-only view of the inventory through copies
+    public Map<String, Resource> viewInventory() {
+        Map<String, Resource> inventoryCopy = new HashMap<>();
+        for (Map.Entry<String, Resource> entry : inventory.entrySet()) {
+            inventoryCopy.put(entry.getKey(), entry.getValue().copy());
+        }
+        return Collections.unmodifiableMap(inventoryCopy);
+    }
+
+    // Create a trade request
+    public TradeRequest createTradeRequest(Resource resource, int amount) {
+        String key = generateKey(resource);
+        return new TradeRequest(this, key, amount);
+    }
+
+    // Create a unified, formatted key
+    private String generateKey(Resource resource) {
+        return resource.getClass().getSimpleName().toUpperCase()
+                + ":" + resource.getName();
+    }
 }
