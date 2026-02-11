@@ -7,15 +7,13 @@ public class TradeRequest implements Comparable<Colony>, Identifiable {
     private final int requestedAmt;
     private final Date timeCreated =  new Date();
     private boolean isFulfilled = false;
+    private static int nextId = 1;
 
-    public TradeRequest(String tr_id, Colony requester, String requestedKey, int requestedAmt) {
+    public TradeRequest(Colony requester, String requestedKey, int requestedAmt) {
         if (requestedAmt < 0) {
             throw new IllegalArgumentException("Requested amount cannot be negative");
         }
-        if (tr_id == null) {
-            throw new IllegalArgumentException("Trade requester id cannot be null");
-        }
-        this.tr_id = tr_id;
+        this.tr_id = "TR" + String.format("%03d", nextId++);
         this.requester = requester;
         this.requestedKey = requestedKey;
         this.requestedAmt = requestedAmt;
