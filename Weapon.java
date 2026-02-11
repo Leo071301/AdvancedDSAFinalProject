@@ -7,5 +7,14 @@ public class Weapon extends Resource{
         this.durability = durability;
     }
 
+    public Weapon (Weapon other) {
+        super(other.getName(), other.getAmount());
+    }
+
+    @Override
+    public Resource copy() {
+        return new Weapon(this);
+    }
+
     public double getDurability(){ return durability; }
 }
