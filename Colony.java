@@ -2,15 +2,18 @@ import java.awt.geom.Point2D;
 import java.util.Map;
 
 public class Colony implements Identifiable {
-    private final long colony_id;
+    private final String colony_id; // e.g. C001
     private String name;
     private final Point2D location;
     private int riskFactor; // 1-5: 1 safest and 5 the most dangerous
     private HashMap<String, Resource> inventory;
 
-    public Colony(long colony_id, String name, Point2D location, int riskFactor) {
+    public Colony(String colony_id, String name, Point2D location, int riskFactor) {
+        if (colony_id == null) {
+            throw new IllegalArgumentException("Colony ID cannot be null");
+        }
         if (riskFactor < 1 || riskFactor > 5) {
-            throw new IllegalArgumentException("riskFactor must be between 1 and 5");
+            throw new IllegalArgumentException("Risk factor must be between 1 and 5");
         }
         this.colony_id = colony_id;
         this.location = location;
@@ -39,7 +42,7 @@ public class Colony implements Identifiable {
     }
 
     @Override
-    public long getId() {
+    public String getId() {
         return colony_id;
     }
 
