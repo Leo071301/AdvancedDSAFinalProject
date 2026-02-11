@@ -7,5 +7,15 @@ public class Food extends Resource{
         this.type = type;
     }
 
+    // Copy constructor
+    public Food(Food other) {
+        super(other.getName(),  other.getAmount());
+    }
+
+    @Override
+    public Resource copy(){
+        return new Food(this);
+    }
+
     public String getType(){ return type; }
 }
