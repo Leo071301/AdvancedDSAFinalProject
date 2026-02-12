@@ -22,4 +22,9 @@ public class Food extends Resource {
     public String getType() {
         return type;
     }
+
+    @Override
+    public String toString() {
+        return getName() + " (" + type + ") x" + getAmount();
+    }
 }
