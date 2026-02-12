@@ -33,7 +33,7 @@ public class TradeRequest implements Comparable<TradeRequest>, Identifiable {
     }
 
     public int getRequestedAmt() {
-        return requestedResource.getAmount();
+        return requestedAmt;
     }
 
     public Date getTimeCreated() {
@@ -54,6 +54,7 @@ public class TradeRequest implements Comparable<TradeRequest>, Identifiable {
     public String toString() {
         return requester.getName() + "'s Trade Request:\n"
                 + "Trade ID: " + tr_id + "\n"
-                + "Resource Wanted: " + requestedResource.toString();
+                + "Resource Wanted: " + requestedResource.toString() + "\n"
+                + "Date Created: " + timeCreated + "\n";
     }
 }
