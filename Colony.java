@@ -9,15 +9,13 @@ public class Colony implements Identifiable {
     private final Point2D location;
     private int riskFactor; // 1-5: 1 safest and 5 the most dangerous
     private HashMap<String, Resource> inventory = new HashMap<>();
+    private static int nextId = 1;
 
-    public Colony(String colony_id, String name, Point2D location, int riskFactor) {
-        if (colony_id == null) {
-            throw new IllegalArgumentException("Colony ID cannot be null");
-        }
+    public Colony(String name, Point2D location, int riskFactor) {
         if (riskFactor < 1 || riskFactor > 5) {
             throw new IllegalArgumentException("Risk factor must be between 1 and 5");
         }
-        this.colony_id = colony_id;
+        this.colony_id = "C" + String.format("%03d", nextId++);
         this.location = location;
         this.name = name;
         this.riskFactor = riskFactor;
@@ -106,5 +104,11 @@ public class Colony implements Identifiable {
     private String generateKey(Resource resource) {
         return resource.getClass().getSimpleName().toUpperCase()
                 + ":" + resource.getName();
+    }
+
+    @Override
+    public String toString() {
+        return "Colony: " + name + "\nColony ID: " + colony_id + "\nLocation: (" + location.getX()
+                + ", " + location.getY() + ")" + "\nRisk Factor: " + riskFactor;
     }
 }
