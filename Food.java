@@ -1,21 +1,25 @@
-public class Food extends Resource{
+public class Food extends Resource {
 
-    private String type;
+    private String type; // e.g., "Pills", "Canned", etc.
 
-    public Food(String name, int amount, String type){
+    // Trade request constructor
+    public Food(String name, int amount, String type) {
         super(name, amount);
         this.type = type;
     }
 
-    // Copy constructor
+    // Copy constructor (for inventory copy)
     public Food(Food other) {
-        super(other.getName(),  other.getAmount());
+        super(other.getName(), other.getAmount());
+        this.type = other.type;
     }
 
     @Override
-    public Resource copy(){
-        return new Food(this);
+    public Resource copy() {
+        return new Food(this); // uses copy constructor
     }
 
-    public String getType(){ return type; }
+    public String getType() {
+        return type;
+    }
 }
