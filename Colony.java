@@ -94,12 +94,6 @@ public class Colony implements Identifiable {
         return Collections.unmodifiableMap(inventoryCopy);
     }
 
-    // Create a trade request
-    public TradeRequest createTradeRequest(Resource resource, int amount) {
-        String key = generateKey(resource);
-        return new TradeRequest(this, key, amount);
-    }
-
     // Create a unified, formatted key
     private String generateKey(Resource resource) {
         return resource.getClass().getSimpleName().toUpperCase()
