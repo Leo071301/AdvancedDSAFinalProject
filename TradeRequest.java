@@ -1,22 +1,22 @@
 import java.util.Date;
 
-public class TradeRequest implements Comparable<Colony>, Identifiable {
+public class TradeRequest implements Comparable<TradeRequest>, Identifiable {
     private final String tr_id; // e.g. TR001
     private final Colony requester; // reference to Colony
-    private final String requestedKey;
+    private Resource requestedResource;
     private final int requestedAmt;
     private final Date timeCreated =  new Date();
     private boolean isFulfilled = false;
     private static int nextId = 1;
 
-    public TradeRequest(Colony requester, String requestedKey, int requestedAmt) {
-        if (requestedAmt < 0) {
+    public TradeRequest(Colony requester, Resource requestedResource) {
+        if (requestedResource.getAmount() < 0) {
             throw new IllegalArgumentException("Requested amount cannot be negative");
         }
         this.tr_id = "TR" + String.format("%03d", nextId++);
         this.requester = requester;
-        this.requestedKey = requestedKey;
-        this.requestedAmt = requestedAmt;
+        this.requestedResource = requestedResource.copy();
+        this.requestedAmt = requestedResource.getAmount();
     }
 
     @Override
@@ -28,12 +28,12 @@ public class TradeRequest implements Comparable<Colony>, Identifiable {
         return requester;
     }
 
-    public String getRequestedKey() {
-        return requestedKey;
+    public Resource getRequestedResource() {
+        return requestedResource;
     }
 
     public int getRequestedAmt() {
-        return requestedAmt;
+        return requestedResource.getAmount();
     }
 
     public Date getTimeCreated() {
@@ -46,5 +46,14 @@ public class TradeRequest implements Comparable<Colony>, Identifiable {
 
     // TODO: create the function that determines trade request matchability
     @Override
-    public int compareTo(Colony o) { return 0; }
+    public int compareTo(TradeRequest o) {
+        return 0;
+    }
+
+    @Override
+    public String toString() {
+        return requester.getName() + "'s Trade Request:\n"
+                + "Trade ID: " + tr_id + "\n"
+                + "Resource Wanted: " + requestedResource.toString();
+    }
 }
