@@ -1,25 +1,32 @@
-public class Food extends Resource {
+public abstract class Resource {
 
-    private String type; // e.g., "Pills", "Canned", etc.
+    private String name;
+    private int amount;
 
-    // Trade request constructor
-    public Food(String name, int amount, String type) {
-        super(name, amount);
-        this.type = type;
+    public Resource(String name, int amount){
+        this.name = name;
+        this.amount = amount;
     }
 
-    // Copy constructor (for inventory copy)
-    public Food(Food other) {
-        super(other.getName(), other.getAmount());
-        this.type = other.type;
+    public int getAmount(){ return amount; }
+
+    public String getName(){ return name; }
+
+    public abstract Resource copy();
+
+    // Add resources to resource amount
+    public void addAmount(int amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("Cannot add negative amount");
+        }
+        this.amount += amount;
     }
 
-    @Override
-    public Resource copy() {
-        return new Food(this); // uses copy constructor
-    }
-
-    public String getType() {
-        return type;
+    // Remove resources from resource amount
+    public void removeAmount(int amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("Cannot remove negative amount");
+        }
+        this.amount -= amount;
     }
 }
