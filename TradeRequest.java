@@ -1,11 +1,11 @@
 import java.util.Date;
 
-public class TradeRequest implements Comparable<TradeRequest>, Identifiable {
+public class TradeRequest implements Identifiable {
     private final String tr_id; // e.g. TR001
-    private final Colony requester; // reference to Colony
+    private final Colony requester; // reference to Colony who made trade request
     private Resource requestedResource;
     private final int requestedAmt;
-    private final Date timeCreated =  new Date();
+    private final Date timeCreated =  new Date(); // time when the trade request is created
     private boolean isFulfilled = false;
     private static int nextId = 1;
 
@@ -13,7 +13,7 @@ public class TradeRequest implements Comparable<TradeRequest>, Identifiable {
         if (requestedResource.getAmount() < 0) {
             throw new IllegalArgumentException("Requested amount cannot be negative");
         }
-        this.tr_id = "TR" + String.format("%03d", nextId++);
+        this.tr_id = "TR" + String.format("%03d", nextId++); // generate trade request's unique id when created
         this.requester = requester;
         this.requestedResource = requestedResource.copy();
         this.requestedAmt = requestedResource.getAmount();
@@ -42,12 +42,6 @@ public class TradeRequest implements Comparable<TradeRequest>, Identifiable {
 
     public boolean isFulfilled() {
         return isFulfilled;
-    }
-
-    // TODO: create the function that determines trade request matchability
-    @Override
-    public int compareTo(TradeRequest o) {
-        return 0;
     }
 
     @Override
