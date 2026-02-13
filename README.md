@@ -22,20 +22,22 @@ manages orderly allocation of resources to colonies in need.
 - Comparable.java: Used for sorting trade requests
 - Identifiable.java: Used for unique identification
 - Tester.java: The "main" program where all the objects are initialized and ran
+- TradeManger.java:
 
 ## Data Model Decisions:
 - HashMap for the inventory to allow for fast lookup
 - UnmodifiableMap of deep copies for viewing the inventory to keep colonies' inventories secure
 - Polymorphism to allow diverse subclasses of the broad and general superclass Resource
+- Priority Queue
 
 ## How to Run:
 Compile and execute the Tester.java file
 
 ## Limitations:
 - Colonies cannot request more than one type of item at a time
-- The trade request matching is currently manual and not automated
+-
 
 ## Future Implementations:
-- Trade Manager Class that auto-matches trade requests
 - Including risk factor as a criteria for matching trade requests
+
 - Utilizing Point2D's .distance() method to calculate distances between colonies
