@@ -2,7 +2,7 @@ public class Food extends Resource {
 
     private String type; // e.g., "Pills", "Canned", etc.
 
-    // Trade request constructor
+    // Inventory/Request constructor
     public Food(String name, int amount, String type) {
         super(name, amount);
         this.type = type;
