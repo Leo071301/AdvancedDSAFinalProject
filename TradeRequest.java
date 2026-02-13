@@ -10,8 +10,8 @@ public class TradeRequest implements Comparable<TradeRequest>, Identifiable {
     private static int nextId = 1;
 
     public TradeRequest(Colony requester, Resource requestedResource) {
-        if (requestedResource.getAmount() < 0) {
-            throw new IllegalArgumentException("Requested amount cannot be negative");
+        if (requestedResource.getAmount() <= 0) {
+            throw new IllegalArgumentException("Requested amount must be greater than zero");
         }
         this.tr_id = "TR" + String.format("%03d", nextId++); // generate trade request's unique id when created
         this.requester = requester;
