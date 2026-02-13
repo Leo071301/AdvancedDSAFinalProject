@@ -1,6 +1,6 @@
 import java.util.Date;
 
-public class TradeRequest implements Identifiable {
+public class TradeRequest implements Comparable<TradeRequest>, Identifiable {
     private final String tr_id; // e.g. TR001
     private final Colony requester; // reference to Colony who made trade request
     private Resource requestedResource;
@@ -42,6 +42,12 @@ public class TradeRequest implements Identifiable {
 
     public boolean isFulfilled() {
         return isFulfilled;
+    }
+
+    // TODO: create the function that determines trade request sortability
+    @Override
+    public int compareTo(TradeRequest o) {
+        return 0;
     }
 
     @Override
