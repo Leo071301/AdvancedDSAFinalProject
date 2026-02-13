@@ -44,9 +44,14 @@ public class TradeRequest implements Comparable<TradeRequest>, Identifiable {
         return isFulfilled;
     }
 
-    // TODO: create the function that determines trade request sortability
+    // Determines trade request sortability by time created
     @Override
     public int compareTo(TradeRequest o) {
+        if (this.timeCreated.after(o.getTimeCreated())) {
+            return -1;
+        } else if (this.timeCreated.before(o.getTimeCreated())) {
+            return 1;
+        }
         return 0;
     }
 
@@ -54,7 +59,7 @@ public class TradeRequest implements Comparable<TradeRequest>, Identifiable {
     public String toString() {
         return requester.getName() + "'s Trade Request:\n"
                 + "Trade ID: " + tr_id + "\n"
-                + "Resource Wanted: " + requestedResource.toString() + "\n"
-                + "Date Created: " + timeCreated + "\n";
+                + "Date Created: " + timeCreated
+                + "\nResource Wanted: " + requestedResource.toString() + "\n";
     }
 }
