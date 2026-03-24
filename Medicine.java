@@ -6,7 +6,7 @@ public class Medicine extends Resource {
     public Medicine() {
         this("Unknown", 0, "Unknown");
     }
-
+    
     // Inventory/Request constructor
     public Medicine(String name, int amount, String type){
         super(name, amount);
