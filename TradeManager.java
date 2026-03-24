@@ -1,83 +1,84 @@
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.List;
 
 public class TradeManager {
 
-    List<TradeRequest> openRequests = new ArrayList<>();
+    private Queue<TradeRequest> openRequests = new LinkedList<>();
+    private List<Colony> colonies = new ArrayList<>();
 
-    List<Colony> colonies = new ArrayList<>();
+    public void addColony(Colony colony) {
+        if (colony == null || colonies.contains(colony)) {
+            return;
+        }
+
+        int index = 0;
+        // Find the first colony that should come after this colony
+        while (index < colonies.size() && colonies.get(index).compareTo(colony) < 0) {
+            index++;
+        }
+
+        // Insert colony at that index
+        colonies.add(index, colony);
+    }
 
     public void addRequest(TradeRequest trade){
         openRequests.add(trade);
     }
 
-    public void matchTrades(){
+    public boolean matchTrades(){
+        if (openRequests.isEmpty()){ return false; }
 
-        // use TradeRequest.compareTo() to sort open requests by timestamp (+ urgency maybe)
-        Collections.sort(openRequests);
+        // Sort requests by time created (FIFO)
+        // Convert open requests to ArrayList for sorting
+        ArrayList<TradeRequest> sortedRequests = new ArrayList<>(openRequests);
+        SearchSortUtils.mergeSort(sortedRequests);
 
         TradeRequest matched = null;
 
-        // iterate through openRequests in priority order
-        // for each request:
-        for(TradeRequest request : openRequests){
-            // call findCandidates(request)
+        // Iterate through the prioritized list
+        java.util.Iterator<TradeRequest> it = sortedRequests.iterator();
+
+        while (it.hasNext()) {
+            TradeRequest request = it.next();
             List<Colony> candidates = findCandidates(request);
-            // if candidates list is empty -> continue to the next request
-            if(candidates.isEmpty()){
-                continue; // skip current request
-            }
-            // call chooseBestProvider(request, candidates)
+
+            if (candidates.isEmpty()) { continue; }
+
             Colony bestProvider = chooseBestProvider(request, candidates);
-            // if best provider is found:
-            if(bestProvider != null){
-                // call executeTrade(request, bestProvider)
-                boolean executed = executeTrade(request, bestProvider);
 
-                if(executed){
-                    matched = request;
-                    break; // stop (only one match per call)
+            if (bestProvider != null){
+                if (executeTrade(request, bestProvider)) {
+                    // Remove from the queue/list
+                    openRequests.remove(request);
+                    return true;
                 }
-
-                // otherwise keep looping to try the next request
             }
         }
-
-        if(matched != null){
-            openRequests.remove(matched);
-        }
-        // if no request matched, exit without any changes
-
-
+        return false;
     }
 
     public List<Colony> findCandidates(TradeRequest request){
-
         List<Colony> eligibleCandidates = new ArrayList<>();
 
-        Colony requested = request.getRequester();
+        Colony requester = request.getRequester();
         Resource requestedItem = request.getRequestedResource();
         int amount = request.getRequestedAmt();
 
-        // for each colony:
-        for(Colony colony : colonies){
-            // if colony is not the requestor
-            if(colony == requested){
-                continue;
-            }
+        // O(log n) search to find where requester is in sorted list
+        int requesterIndex = SearchSortUtils.binarySearchById((ArrayList<Colony>) colonies, requester.getId());
 
-            // if colony inventory contains requested item
-            if(colony.hasResource(requestedItem, amount)){
+        for (int i = 0; i < colonies.size(); i++) {
+            // Skip the requester
+            if (i == requesterIndex){ continue; }
+
+            Colony colony = colonies.get(i);
+
+            if (colony.hasResource(requestedItem.getName(), amount, requestedItem.getClass())) {
                 eligibleCandidates.add(colony);
-
             }
         }
-            // if colonyAmount >= requestAmount
-            // if colonyAmount - requestAmount >= colonyMinimum
-                // add to eligible candidates
-
-
         return eligibleCandidates;
     }
 
@@ -99,52 +100,41 @@ public class TradeManager {
             // calculate compatabilityScore (risk weighted heavier than distance)
             double score = compatabilityScore(requester, candidate);
 
-            // track highest score (if this.score > other.score, then max is this.score)
+            // track greatest score (if this.score > other.score, then max is this.score)
             if(score > bestScore){
                 bestScore = score;
                 bestProvider = candidate;
             }
         }
-
-
-
         // return colony with the highest compatability score
-
         return bestProvider;
     }
 
-
-
     public boolean executeTrade(TradeRequest trade, Colony bestProvider){
 
-        Colony requestor = trade.getRequester();
+        Colony requester = trade.getRequester();
         Resource template = trade.getRequestedResource();
         int amount = trade.getRequestedAmt();
 
         // revalidate that provider is still eligible
-        if(!bestProvider.hasResource(template, amount)){
+        if(!bestProvider.hasResource(template.getName(), amount, template.getClass())){
             return false;
         }
 
-        // build a transfer resource object with the right subtype + metadata + amount I guess
+        // build a transfer resource object with the right subtype + metadata + amount
         Resource transfer = buildTransferResource(template, amount);
 
-
         // update provider inventory (subtract)
-        bestProvider.removeResource(transfer);
+        bestProvider.removeResource(transfer.getName(), amount, transfer.getClass());
 
         // update requester inventory (add)
-        requestor.addResource(transfer);
-
-        // remove trade from openRequests (done in matcheTrade())
+        requester.addResource(transfer);
 
         return true;
-
-
     }
 
-    private double compatabilityScore(Colony requestor, Colony provider){
-        double distance = requestor.getLocation().distance(provider.getLocation());
+    private double compatabilityScore(Colony requester, Colony provider){
+        double distance = requester.getLocation().distance(provider.getLocation());
         int risk = provider.getRiskFactor();
 
         // tunable weights
@@ -172,11 +162,8 @@ public class TradeManager {
             return new Weapon(name, amount, weapon.getDurability());
         }
 
-        // Fallback: if new resoure subclasses appear and you forget to handle them.
+        // Fallback: if new resource subclasses appear, and you forget to handle them.
         // You can either throw or return template.copy() and accept amount mismatch risk
         throw new IllegalArgumentException("Unsupported resource subclass: " + template.getClass().getName());
-
     }
-
-
 }
