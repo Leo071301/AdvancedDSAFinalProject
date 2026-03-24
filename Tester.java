@@ -1,8 +1,10 @@
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Tester {
     public static void main(String[] args) {
+
         System.out.println("=== PHASE 2: ALGORITHM & LOGIC VERIFICATION ===\n");
 
         TradeManager manager = new TradeManager();
@@ -95,6 +97,64 @@ public class Tester {
         boolean matched = manager.matchTrades();
         System.out.println("Attempting match for " + impossible.getId() + "...");
         System.out.println("Impossible Trade matched? " + matched);
+
+        // --- Identity & Hash Verification ---
+        System.out.println("--- Section 0: Identity & Hash Verification ---");
+
+        // 1. Verify Uniqueness (Static counter check)
+        System.out.println("Alpha ID: " + alpha.getId());
+        System.out.println("Beta ID: " + beta.getId());
+        System.out.println("IDs are unique? " + (!alpha.getId().equals(beta.getId())));
+
+        // 2. Verify hashCode (Should be different for different IDs)
+        int hashA = alpha.hashCode();
+        int hashB = beta.hashCode();
+        System.out.println("Alpha Hash: " + hashA);
+        System.out.println("Beta Hash: " + hashB);
+        System.out.println("Hashes are different? " + (hashA != hashB));
+
+        // 3. Verify equals() Contract
+        // Since they have different IDs, they MUST not be equal
+        System.out.println("Alpha equals Beta? " + alpha.equals(beta));
+
+        // 4. Verify HashMap Integrity
+        java.util.HashMap<Colony, String> colonyMap = new java.util.HashMap<>();
+        colonyMap.put(alpha, "Primary Hub");
+        System.out.println("HashMap can find Alpha? " + colonyMap.containsKey(alpha));
+        System.out.println();
+
+        // --- Benchmarking Experiment (Requirement: 10,000+ objects) ---
+        System.out.println("\n--- Performance Benchmark ---");
+
+        int dataSize = 1000000; // Requirement: 10,000 or more
+        ArrayList<Resource> largeList1 = new ArrayList<>();
+
+        // Generate dataset
+        for (int i = 0; i < dataSize; i++) {
+            // Using random-ish names to ensure the sort has work to do
+            largeList1.add(new Food("Item" + (int)(Math.random() * 10000), i, "Bulk"));
+        }
+
+        // Create a copy so both tests start with the same unsorted data
+        ArrayList<Resource> largeList2 = new ArrayList<>(largeList1);
+
+        // Test 1: Manual Sort (Merge Sort) [cite: 49]
+        long startManual = System.currentTimeMillis();
+        SearchSortUtils.mergeSort(largeList1);
+        long endManual = System.currentTimeMillis();
+        long manualDuration = endManual - startManual;
+
+        // Test 2: Java's Built-in Sort [cite: 50]
+        long startJava = System.currentTimeMillis();
+        Collections.sort(largeList2);
+        long endJava = System.currentTimeMillis();
+        long javaDuration = endJava - startJava;
+
+        // Report results [cite: 51, 106]
+        System.out.println("Dataset Size: " + dataSize);
+        System.out.println("Manual Merge Sort Time: " + manualDuration + " ms");
+        System.out.println("Java Collections.sort() Time: " + javaDuration + " ms");
+        System.out.println("Difference: " + (manualDuration - javaDuration) + " ms");
     }
 
     private static int getResourceCount(Colony c, String name, Class<?> type) {
