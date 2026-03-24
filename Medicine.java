@@ -2,6 +2,11 @@ public class Medicine extends Resource {
 
     private String type;
 
+    // No-arg constructor
+    public Medicine() {
+        this("Unknown", 0, "Unknown");
+    }
+
     // Inventory/Request constructor
     public Medicine(String name, int amount, String type){
         super(name, amount);
@@ -24,5 +29,18 @@ public class Medicine extends Resource {
     @Override
     public String toString() {
         return getName() + " (" + type + ") x" + getAmount();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Medicine m = (Medicine) o;
+        return this.getName().equalsIgnoreCase(m.getName()) && this.type.equalsIgnoreCase(m.getType());
+    }
+
+    @Override
+    public int hashCode() {
+        return (getName().toLowerCase() + type.toLowerCase()).hashCode();
     }
 }
