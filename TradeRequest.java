@@ -9,9 +9,18 @@ public class TradeRequest implements Comparable<TradeRequest>, Identifiable {
     private boolean isFulfilled = false;
     private static int nextId = 1;
 
+    // No-arg constructor
+    public TradeRequest() {
+        this.tr_id = "TR" + String.format("%03d", nextId++);
+        this.requester = null;
+        this.requestedResource = null;
+        this.requestedAmt = 0;
+    }
+
+    // Overloaded constructor
     public TradeRequest(Colony requester, Resource requestedResource) {
-        if (requestedResource.getAmount() <= 0) {
-            throw new IllegalArgumentException("Requested amount must be greater than zero");
+        if (requestedResource.getAmount() < 0) {
+            throw new IllegalArgumentException("Requested amount cannot be negative");
         }
         this.tr_id = "TR" + String.format("%03d", nextId++); // generate trade request's unique id when created
         this.requester = requester;
@@ -47,19 +56,29 @@ public class TradeRequest implements Comparable<TradeRequest>, Identifiable {
     // Determines trade request sortability by time created
     @Override
     public int compareTo(TradeRequest o) {
-        if (this.timeCreated.after(o.getTimeCreated())) {
-            return -1;
-        } else if (this.timeCreated.before(o.getTimeCreated())) {
-            return 1;
-        }
-        return 0;
+        return this.timeCreated.compareTo(o.timeCreated);
     }
 
     @Override
     public String toString() {
-        return requester.getName() + "'s Trade Request:\n"
+        String name = (requester != null) ? requester.getName() : "Unknown Requester";
+        return name + "'s Trade Request:\n"
                 + "Trade ID: " + tr_id + "\n"
                 + "Date Created: " + timeCreated
                 + "\nResource Wanted: " + requestedResource.toString() + "\n";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TradeRequest tr = (TradeRequest) o;
+        // Check if trade request IDs are equal
+        return this.tr_id.equals(tr.tr_id);
+    }
+
+    @Override
+    public int hashCode() {
+        return tr_id.hashCode();
     }
 }
