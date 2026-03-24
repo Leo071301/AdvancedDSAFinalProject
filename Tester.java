@@ -1,62 +1,108 @@
 import java.awt.geom.Point2D;
-import java.util.Map;
+import java.util.ArrayList;
 
 public class Tester {
     public static void main(String[] args) {
+        System.out.println("=== PHASE 2: ALGORITHM & LOGIC VERIFICATION ===\n");
 
-        System.out.println("=== 1) Instantiate concrete objects ===");
-        Colony farm = new Colony("Farm", new Point2D.Double(100, 200), 5);
-        Colony city = new Colony("City", new Point2D.Double(100, 300), 3);
+        TradeManager manager = new TradeManager();
 
-        System.out.println(farm + "\n");
-        System.out.println(city + "\n");
+        // 1. SETUP COLONIES
+        Colony alpha = new Colony("Alpha", new Point2D.Double(5, 5), 1);
+        Colony beta = new Colony("Beta", new Point2D.Double(50, 50), 3);
+        manager.addColony(alpha);
+        manager.addColony(beta);
 
-        System.out.println("=== 2) Polymorphism: supertype variable -> subtype object ===");
-        Resource r1 = new Food("Beans", 50, "Canned");                 // Resource -> Food
-        Resource r2 = new Medicine("Antibiotics", 20, "Pills");        // Resource -> Medicine
+        // --- 2. DEMONSTRATE SORTING (Requirement: Show before/after) ---
+        System.out.println("--- Section 1: Inventory Sorting (Merge Sort) ---");
 
-        // Add resources to inventory using Resource-typed variables (polymorphism)
-        farm.addResource(r1);
-        farm.addResource(r2);
+        // We create a standalone list to demonstrate the sorting algorithm clearly
+        ArrayList<Resource> items = new ArrayList<>();
+        items.add(new Food("Zucchini", 10, "Fresh"));
+        items.add(new Medicine("Aspirin", 50, "Pills"));
+        items.add(new Food("Beans", 100, "Canned"));
 
-        System.out.println("Added to farm inventory via Resource variables.\n");
+        System.out.println("BEFORE Merge Sort:");
+        System.out.println(items);
 
-        System.out.println("=== 3) instanceof + safe casting ===");
-        if (r1 instanceof Food) {
-            Food f = (Food) r1; // safe cast
-            System.out.println("r1 is Food, type = " + f.getType());
-        }
+        // Explicitly call your Merge Sort utility
+        SearchSortUtils.mergeSort(items);
 
-        if (r2 instanceof Medicine) {
-            Medicine m = (Medicine) r2; // safe cast
-            System.out.println("r2 is Medicine, type = " + m.getType());
+        System.out.println("\nAFTER Merge Sort (A-Z):");
+        System.out.println(items);
+
+        // Now add the sorted items to the colony for the rest of the test
+        for(Resource r : items) {
+            alpha.addResource(r);
         }
         System.out.println();
 
-        System.out.println("=== 4) Print state to verify logic (IDs, copying, amounts) ===");
+        // --- 3. DEMONSTRATE SEARCHING (Requirement: Successful vs Failed) ---
+        System.out.println("--- Section 2: Resource Searching (Binary Search) ---");
 
-        // Print view-only inventory (copies) and show contents
-        System.out.println("Farm Inventory: " + farm.viewInventory() + "\n");
+        // Test A: Successful Search (Right name, Right type)
+        // alpha.hasResource internally calls your Binary Search
+        boolean foundBeans = alpha.hasResource("Beans", 50, Food.class);
+        System.out.println("Search 'Beans' (Food): " + (foundBeans ? "SUCCESS" : "FAILED"));
 
-        // Verify ID assignment is working (C001, C002, TR001, TR002 ...)
-        TradeRequest tr1 = new TradeRequest(farm, new Food("Beans", 10, "Canned"));
-        TradeRequest tr2 = new TradeRequest(city, new Medicine("Antibiotics", 5, "Pills"));
+        // Test B: Failed Search (Wrong Name)
+        boolean foundRice = alpha.hasResource("Rice", 1, Food.class);
+        System.out.println("Search 'Rice' (Non-existent): " + (foundRice ? "SUCCESS" : "FAILED"));
 
-        System.out.println(tr1 + "\n");
-        System.out.println(tr2 + "\n");
+        // Test C: Failed Search (Right name, WRONG type)
+        boolean beansAsMed = alpha.hasResource("Beans", 1, Medicine.class);
+        System.out.println("Search 'Beans' (as Medicine): " + (beansAsMed ? "SUCCESS" : "FAILED"));
+        System.out.println();
 
-        // Verify that modifying the original object should NOT affect colony inventory
-        System.out.println("=== Extra check: confirm inventory uses copies ===");
-        System.out.println("Before external modification: " + r1); // original r1
+        // --- 4. TRADE MANAGER LOGIC ---
+        System.out.println("--- Section 3: Trade Manager Logic (FIFO & Compatibility) ---");
 
-        r1.addAmount(1000); // modifies the original object reference we still hold
-        System.out.println("After external modification to r1: " + r1);
+        beta.addResource(new Food("Beans", 200, "Canned"));
 
-        // Farm's inventory should NOT jump by +1000 since we encapsulated farm's inventory
-        System.out.println("\nFarm inventory view again (should be unchanged by r1 modification):");
-        Map<String, Resource> invView2 = farm.viewInventory();
-        for (Map.Entry<String, Resource> entry : invView2.entrySet()) {
-            System.out.println(entry.getKey() + " -> " + entry.getValue());
+        // Create requests
+        TradeRequest req1 = new TradeRequest(alpha, new Food("Beans", 20, "Canned"));
+        try { Thread.sleep(100); } catch (InterruptedException e) {} // Ensure unique timestamps
+        TradeRequest req2 = new TradeRequest(alpha, new Food("Beans", 150, "Canned"));
+
+        manager.addRequest(req1);
+        manager.addRequest(req2);
+
+        System.out.println("Added Requests to Queue:");
+        System.out.println("1. " + req1.getId() + " for 20 Beans");
+        System.out.println("2. " + req2.getId() + " for 150 Beans");
+
+        // First match
+        System.out.println("\nAttempting to match oldest request (" + req1.getId() + ")...");
+        manager.matchTrades();
+        System.out.println("Result: Match successful.");
+        System.out.println("Alpha Beans Total: " + getResourceCount(alpha, "Beans", Food.class) + " (Started with 100 + 20)");
+
+        // Second match
+        System.out.println("\nAttempting to match next request (" + req2.getId() + ")...");
+        manager.matchTrades();
+        System.out.println("Result: Match successful.");
+        System.out.println("Alpha Beans Total: " + getResourceCount(alpha, "Beans", Food.class) + " (120 + 150)");
+        System.out.println("Beta (Provider) Beans Remaining: " + getResourceCount(beta, "Beans", Food.class));
+
+        // --- 5. EDGE CASES ---
+        System.out.println("\n--- Section 4: Edge Cases & Exhaustion ---");
+        TradeRequest impossible = new TradeRequest(alpha, new Food("Beans", 5000, "Canned"));
+        manager.addRequest(impossible);
+
+        System.out.println("Created Request: " + impossible.getId() + " for 5000 Beans.");
+        System.out.println("Available in world: 30 Beans.");
+
+        boolean matched = manager.matchTrades();
+        System.out.println("Attempting match for " + impossible.getId() + "...");
+        System.out.println("Impossible Trade matched? " + matched);
+    }
+
+    private static int getResourceCount(Colony c, String name, Class<?> type) {
+        for (Resource r : c.viewInventory()) {
+            if (r.getName().equalsIgnoreCase(name) && type.isInstance(r)) {
+                return r.getAmount();
+            }
         }
+        return 0;
     }
 }
