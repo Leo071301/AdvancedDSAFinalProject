@@ -1,16 +1,20 @@
 import java.awt.geom.Point2D;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
 
-public class Colony implements Identifiable {
+public class Colony implements Comparable<Colony>, Identifiable {
     private final String colony_id; // e.g. C001
     private String name;
     private final Point2D location; // Coordinates of colony's location
     private int riskFactor; // 1-5: 1 safest and 5 the most dangerous
-    private HashMap<String, Resource> inventory = new HashMap<>();
+    private ArrayList<Resource> inventory = new ArrayList<>();
     private static int nextId = 1;
 
+    // No-arg constructor
+    public Colony() {
+        this("Unknown Colony", null, 1);
+    }
+
+    // Overloaded constructor
     public Colony(String name, Point2D location, int riskFactor) {
         if (riskFactor < 1 || riskFactor > 5) {
             throw new IllegalArgumentException("Risk factor must be between 1 and 5");
@@ -51,58 +55,87 @@ public class Colony implements Identifiable {
 
     // Add resources to the inventory
     public void addResource(Resource resource) {
-        String key = generateKey(resource);
-        if (inventory.containsKey(key)) { // Add the resource to inventory if it is already in the inventory
-            inventory.get(key).addAmount(resource.getAmount());
-        } else { // Put the resource in inventory
-            inventory.put(key, resource.copy());
+        sortInventoryByName();
+        int index = SearchSortUtils.binarySearchResource(inventory, resource.getName(), resource.getClass());
+
+        if (index != -1) {
+            // Match found, so update the amount
+            inventory.get(index).addAmount(resource.getAmount());
+        } else {
+            // No match found, add a new copy
+            inventory.add(resource.copy());
         }
+        // Ensure that inventory is sorted A-Z after adding items
+        sortInventoryByName();
     }
 
     // Remove resources from the inventory
-    public void removeResource(Resource resource) {
-        String key = generateKey(resource);
+    public boolean removeResource(String resourceName, int amount, Class<?> type) {
+        sortInventoryByName();
+        int index = SearchSortUtils.binarySearchResource(inventory, resourceName, type);
 
-        if (!inventory.containsKey(key)) { // Check if inventory does not have that item
-            throw new IllegalArgumentException(resource + " does not exist!");
+        if (index != -1 && inventory.get(index).getAmount() >= amount) {
+            inventory.get(index).removeAmount(amount);
+            if (inventory.get(index).getAmount() == 0) {
+                inventory.remove(index);
+            }
+            return true;
         }
-
-        Resource existing = inventory.get(key);
-
-        if (resource.getAmount() >= existing.getAmount()) {
-            // Remove the resource entirely if requested amount >= stored amount
-            inventory.remove(key);
-        } else {
-            // Otherwise, just decrease the amount
-            existing.removeAmount(resource.getAmount());
-        }
+        return false;
     }
 
     // Check whether the colony's inventory contains at least "amount" of that resource
-    public boolean hasResource(Resource resource, int amount) {
-        String key = generateKey(resource);
-        Resource existing = inventory.get(key);
-        return existing != null && existing.getAmount() >= amount;
-    }
+    public boolean hasResource(String resourceName, int amount, Class<?> type) {
+        sortInventoryByName();
+        int index = SearchSortUtils.binarySearchResource(inventory, resourceName, type);
 
-    // Return a fully safe, read-only view of the inventory through copies
-    public Map<String, Resource> viewInventory() {
-        Map<String, Resource> inventoryCopy = new HashMap<>();
-        for (Map.Entry<String, Resource> entry : inventory.entrySet()) {
-            inventoryCopy.put(entry.getKey(), entry.getValue().copy());
+        if (index != -1) {
+            return inventory.get(index).getAmount() >= amount;
         }
-        return Collections.unmodifiableMap(inventoryCopy);
+        return false;
     }
 
-    // Create a unified, formatted key
-    private String generateKey(Resource resource) {
-        return resource.getClass().getSimpleName().toUpperCase()
-                + ":" + resource.getName();
+    // Return safe copy of inventory
+    public ArrayList<Resource> viewInventory() {
+        ArrayList<Resource> copyList = new ArrayList<>();
+        for (Resource r : inventory) {
+            copyList.add(r.copy());
+        }
+        return copyList;
+    }
+
+    // Sort the inventory by name using Merge Sort
+    public void sortInventoryByName() {
+        SearchSortUtils.mergeSort(this.inventory);
     }
 
     @Override
     public String toString() {
         return "Colony: " + name + "\nColony ID: " + colony_id + "\nLocation: (" + location.getX()
                 + ", " + location.getY() + ")" + "\nRisk Factor: " + riskFactor;
+    }
+
+    @Override
+    public int compareTo(Colony o) {
+        return this.colony_id.compareTo(o.colony_id);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        // Check if same address in memory
+        if (this == o) return true;
+
+        // Check if other colony is null or not the same class
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Colony other = (Colony) o;
+
+        // Check if colony IDs are equal
+        return this.colony_id.equals(other.colony_id);
+    }
+
+    @Override
+    public int hashCode() {
+        return colony_id.hashCode();
     }
 }
