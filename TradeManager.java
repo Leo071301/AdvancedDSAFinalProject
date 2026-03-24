@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.List;
+import java.util.*;
 
 public class TradeManager {
 
@@ -82,6 +79,14 @@ public class TradeManager {
         return eligibleCandidates;
     }
 
+    private Comparator<Colony> colonyScoreComparator(Colony requester){
+        return (c1, c2) -> {
+            double score1 = compatabilityScore(requester, c1);
+            double score2 = compatabilityScore(requester, c2);
+            return Double.compare(score2, score1);
+        };
+    }
+
     public Colony chooseBestProvider(TradeRequest request, List<Colony> candidates){
 
         // if candidate list is empty, return null. only time null needs to be returned
@@ -89,25 +94,9 @@ public class TradeManager {
             return null;
         }
 
-        Colony requester = request.getRequester();
+        candidates.sort(colonyScoreComparator(request.getRequester()));
 
-        // initialize variable to track bestProvider and highestScore
-        Colony bestProvider = null;
-        double bestScore = Double.NEGATIVE_INFINITY;
-
-        // for each candidate:
-        for(Colony candidate : candidates){
-            // calculate compatabilityScore (risk weighted heavier than distance)
-            double score = compatabilityScore(requester, candidate);
-
-            // track greatest score (if this.score > other.score, then max is this.score)
-            if(score > bestScore){
-                bestScore = score;
-                bestProvider = candidate;
-            }
-        }
-        // return colony with the highest compatability score
-        return bestProvider;
+        return candidates.get(0);
     }
 
     public boolean executeTrade(TradeRequest trade, Colony bestProvider){
