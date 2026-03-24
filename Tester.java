@@ -1,6 +1,7 @@
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class Tester {
     public static void main(String[] args) {
@@ -155,6 +156,26 @@ public class Tester {
         System.out.println("Manual Merge Sort Time: " + manualDuration + " ms");
         System.out.println("Java Collections.sort() Time: " + javaDuration + " ms");
         System.out.println("Difference: " + (manualDuration - javaDuration) + " ms");
+
+        // --- Custom Comparator Verification ---
+        System.out.println("--- Section 6: Provider Ranking (Custom Comparator) ---");
+
+        // 1. Setup a "Choice" scenario
+        Colony gamma = new Colony("Gamma", new Point2D.Double(6, 6), 1); // Very close & safe
+        manager.addColony(gamma);
+        gamma.addResource(new Food("Beans", 100, "Canned"));
+
+        // 2. Create a request that both Beta and Gamma can fulfill
+        TradeRequest choiceReq = new TradeRequest(alpha, new Food("Beans", 10, "Canned"));
+
+        // 3. Manually call your ranking logic to see the sorted list
+        List<Colony> candidates = manager.findCandidates(choiceReq);
+        // This calls the Comparator sort internally in your chooseBestProvider
+        Colony best = manager.chooseBestProvider(choiceReq, candidates);
+
+        System.out.println("Candidates found: " + candidates.size());
+        System.out.println("Top Ranked Provider: " + best.getName() + " (ID: " + best.getId() + ")");
+        System.out.println("Ranking Check: " + (best == gamma ? "SUCCESS (Gamma is better than Beta)" : "FAILED"));
     }
 
     private static int getResourceCount(Colony c, String name, Class<?> type) {
