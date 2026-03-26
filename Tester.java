@@ -124,7 +124,7 @@ public class Tester {
         System.out.println("HashMap can find Alpha? " + colonyMap.containsKey(alpha));
 
         // --- Custom Comparator Verification ---
-        System.out.println("--- Section 6: Provider Ranking (Custom Comparator) ---");
+        System.out.println("\n--- Section 6: Provider Ranking (Custom Comparator) ---");
 
         // 1. Setup a "Choice" scenario
         Colony gamma = new Colony("Gamma", new Point2D.Double(6, 6), 1); // Very close & safe
