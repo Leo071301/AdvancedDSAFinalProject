@@ -158,19 +158,19 @@ public class Tester {
         // Create a copy so both tests start with the same unsorted data
         ArrayList<Resource> largeList2 = new ArrayList<>(largeList1);
 
-        // Test 1: Manual Sort (Merge Sort) [cite: 49]
+        // Test 1: Manual Sort (Merge Sort)
         long startManual = System.currentTimeMillis();
         SearchSortUtils.mergeSort(largeList1);
         long endManual = System.currentTimeMillis();
         long manualDuration = endManual - startManual;
 
-        // Test 2: Java's Built-in Sort [cite: 50]
+        // Test 2: Java's Built-in Sort
         long startJava = System.currentTimeMillis();
         Collections.sort(largeList2);
         long endJava = System.currentTimeMillis();
         long javaDuration = endJava - startJava;
 
-        // Report results [cite: 51, 106]
+        // Report results
         System.out.println("Dataset Size: " + dataSize);
         System.out.println("Manual Merge Sort Time: " + manualDuration + " ms");
         System.out.println("Java Collections.sort() Time: " + javaDuration + " ms");
