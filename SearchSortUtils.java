@@ -68,7 +68,7 @@ public class SearchSortUtils {
             // checks current element against pivot
             //current sorting in descending order(Z-A)
             //change >= to <= to be ascending(A-Z)
-            if(comparator.compare(list.get(i),pivot) <= 0){
+            if(comparator.compare(list.get(i),pivot) >= 0){
                  indx += 1;
                  swap(list, indx, i);
             }
