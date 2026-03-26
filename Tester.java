@@ -16,10 +16,10 @@ public class Tester {
         manager.addColony(alpha);
         manager.addColony(beta);
 
-        // --- 2. DEMONSTRATE SORTING (Requirement: Show before/after) ---
+        // --- 2. DEMONSTRATE SORTING ---
         System.out.println("--- Section 1: Inventory Sorting (Merge Sort) ---");
 
-        // We create a standalone list to demonstrate the sorting algorithm clearly
+        // Create a standalone list to demonstrate the sorting algorithm clearly
         ArrayList<Resource> items = new ArrayList<>();
         items.add(new Food("Zucchini", 10, "Fresh"));
         items.add(new Medicine("Aspirin", 50, "Pills"));
@@ -28,23 +28,21 @@ public class Tester {
         System.out.println("BEFORE Merge Sort:");
         System.out.println(items);
 
-        // Explicitly call your Merge Sort utility
         SearchSortUtils.mergeSort(items);
 
         System.out.println("\nAFTER Merge Sort (A-Z):");
         System.out.println(items);
 
-        // Now add the sorted items to the colony for the rest of the test
+        // Add the sorted items to the colony for the rest of the test
         for(Resource r : items) {
             alpha.addResource(r);
         }
         System.out.println();
 
-        // --- 3. DEMONSTRATE SEARCHING (Requirement: Successful vs Failed) ---
+        // --- 3. DEMONSTRATE SEARCHING ---
         System.out.println("--- Section 2: Resource Searching (Binary Search) ---");
 
         // Test A: Successful Search (Right name, Right type)
-        // alpha.hasResource internally calls your Binary Search
         boolean foundBeans = alpha.hasResource("Beans", 50, Food.class);
         System.out.println("Search 'Beans' (Food): " + (foundBeans ? "SUCCESS" : "FAILED"));
 
@@ -55,10 +53,9 @@ public class Tester {
         // Test C: Failed Search (Right name, WRONG type)
         boolean beansAsMed = alpha.hasResource("Beans", 1, Medicine.class);
         System.out.println("Search 'Beans' (as Medicine): " + (beansAsMed ? "SUCCESS" : "FAILED"));
-        System.out.println();
 
         // --- 4. TRADE MANAGER LOGIC ---
-        System.out.println("--- Section 3: Trade Manager Logic (FIFO & Compatibility) ---");
+        System.out.println("\n--- Section 3: Trade Manager Logic (FIFO & Compatibility) ---");
 
         beta.addResource(new Food("Beans", 200, "Canned"));
 
@@ -126,7 +123,7 @@ public class Tester {
         // --- Custom Comparator Verification ---
         System.out.println("\n--- Section 6: Provider Ranking (Custom Comparator) ---");
 
-        // 1. Setup a "Choice" scenario
+        // 1. Set up a "Choice" scenario
         Colony gamma = new Colony("Gamma", new Point2D.Double(6, 6), 1); // Very close & safe
         manager.addColony(gamma);
         gamma.addResource(new Food("Beans", 100, "Canned"));
@@ -134,9 +131,9 @@ public class Tester {
         // 2. Create a request that both Beta and Gamma can fulfill
         TradeRequest choiceReq = new TradeRequest(alpha, new Food("Beans", 10, "Canned"));
 
-        // 3. Manually call your ranking logic to see the sorted list
+        // 3. Manually call ranking logic to see the sorted list
         List<Colony> candidates = manager.findCandidates(choiceReq);
-        // This calls the Comparator sort internally in your chooseBestProvider
+        // Calls the Comparator sort internally in chooseBestProvider
         Colony best = manager.chooseBestProvider(choiceReq, candidates);
 
         System.out.println("Candidates found: " + candidates.size());
@@ -177,6 +174,7 @@ public class Tester {
         System.out.println("Difference: " + (manualDuration - javaDuration) + " ms");
     }
 
+    // helper method for displaying resource counts
     private static int getResourceCount(Colony c, String name, Class<?> type) {
         for (Resource r : c.viewInventory()) {
             if (r.getName().equalsIgnoreCase(name) && type.isInstance(r)) {
