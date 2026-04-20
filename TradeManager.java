@@ -3,21 +3,15 @@ import java.util.*;
 public class TradeManager {
 
     private Queue<TradeRequest> openRequests = new LinkedList<>();
-    private List<Colony> colonies = new ArrayList<>();
+    private HashMap<String, Colony> colonyMap = new HashMap<>();
 
-    public void addColony(Colony colony) {
-        if (colony == null || colonies.contains(colony)) {
-            return;
-        }
+    public void addColony(Colony colony) { // Add colony through ID string
+        colonyMap.put(colony.getId(), colony);
+        // colonyTree.insert(colony); for ordered lookup with AVLTree when it is implemented
+    }
 
-        int index = 0;
-        // Find the first colony that should come after this colony
-        while (index < colonies.size() && colonies.get(index).compareTo(colony) < 0) {
-            index++;
-        }
-
-        // Insert colony at that index
-        colonies.add(index, colony);
+    public Colony getColony(String id) { // Find colony in O(1) time
+        return colonyMap.get(id);
     }
 
     public void addRequest(TradeRequest trade){
@@ -64,14 +58,15 @@ public class TradeManager {
         int amount = request.getRequestedAmt();
 
         // O(log n) search to find where requester is in sorted list
-        int requesterIndex = SearchSortUtils.binarySearchById((ArrayList<Colony>) colonies, requester.getId());
+        Colony foundRequester = colonyMap.get(requester.getId());
 
-        for (int i = 0; i < colonies.size(); i++) {
-            // Skip the requester
-            if (i == requesterIndex){ continue; }
+        for (Colony colony : colonyMap.values()) {
+            // Skip the requester colony
+            if (colony.getId().equals(foundRequester.getId())) {
+                continue;
+            }
 
-            Colony colony = colonies.get(i);
-
+            // Check if the colony has the resource
             if (colony.hasResource(requestedItem.getName(), amount, requestedItem.getClass())) {
                 eligibleCandidates.add(colony);
             }
