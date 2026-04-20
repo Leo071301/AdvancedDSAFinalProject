@@ -18,6 +18,10 @@ public class TradeManager {
         openRequests.add(trade);
     }
 
+    public void removeColony(Colony colony) { // Remove colony from the hash map
+        colonyMap.remove(colony.getId());
+    }
+
     public boolean matchTrades(){
         if (openRequests.isEmpty()){ return false; }
 
