@@ -12,7 +12,7 @@ Features:
 - Uses polymorphism through a base Resource class with subclasses (Food, Medicine, Weapon)
 - Automatically logs trade requests with unique IDs and timestamps
 - Processes trade requests using FIFO order to ensure fairness
-- Implements sorting (Merge Sort, Quick Sort) and searching (Binary Search)
+- Implements sorting (Merge Sort) and searching (Binary Search)
 - Uses a HashMap for fast colony lookup and management
 - Implements an AVL Tree for balanced indexing (O(log n))
 - Models colony relationships using a weighted graph (adjacency list)
