@@ -253,10 +253,9 @@ public class AVLTree<E extends Comparable<E>>{
     private void inorder(TreeNode<E> node) {
         if (node == null) return;
         inorder(node.left);
-        System.out.print(node.element + " ");
+        System.out.println(node.element + " ");
         inorder(node.right);
     }
-
 
 
     public java.util.Iterator<E> iterator() {
