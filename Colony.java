@@ -111,8 +111,8 @@ public class Colony implements Comparable<Colony>, Identifiable {
 
     @Override
     public String toString() {
-        return "Colony: " + name + "\nColony ID: " + colony_id + "\nLocation: (" + location.getX()
-                + ", " + location.getY() + ")" + "\nRisk Factor: " + riskFactor;
+        return String.format("Colony: %s (ID: %s)\nLocation: (%.1f, %.1f)\nRisk Factor: %d",
+                name, colony_id, location.getX(), location.getY(), riskFactor);
     }
 
     @Override
