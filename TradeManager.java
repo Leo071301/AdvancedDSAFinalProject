@@ -16,6 +16,10 @@ public class TradeManager {
         return colonyMap.get(id);
     }
 
+    public boolean isColonyinSystem(Colony colony) { // Check whether colony exists in system
+        return colonyTree.search(colony);
+    }
+
     public void addRequest(TradeRequest trade){
         openRequests.add(trade);
     }
@@ -23,10 +27,6 @@ public class TradeManager {
     public void removeColony(Colony colony) {
         colonyMap.remove(colony.getId()); // Remove colony from the hash map
         colonyTree.delete(colony); // Remove colony from the AVL Tree
-    }
-
-    public boolean isColonyinSystem(Colony colony) {
-        return colonyTree.search(colony);
     }
 
     public void displayColonies() {
