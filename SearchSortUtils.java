@@ -41,24 +41,6 @@ public class SearchSortUtils {
         return merged;
     }
 
-    // ----------------Quick Sort Method----------------
-    public static <T> void quickSort(ArrayList<T> list, Comparator<? super T> comparator){
-        if (list == null || list.size() <= 1) return;
-
-        recursiveQuickSort(list, 0, list.size()-1,comparator);
-
-
-    }
-    //recursive helper method
-    private static <T> void recursiveQuickSort(ArrayList<T> list, int low, int high,Comparator<? super T> comparator){
-        if(low < high){
-            int pivot = partition(list, low, high,comparator);
-
-            recursiveQuickSort(list, low, pivot-1,comparator);
-            recursiveQuickSort(list, pivot+1, high,comparator);
-        }
-    }
-
     //partitions list based on the last element
     private static <T> int partition(ArrayList<T> list, int low, int high, Comparator<? super T> comparator){
         T pivot = list.get(high);
