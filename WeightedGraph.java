@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WeightedGraph<V> implements Graph<V> {
-    // Stores the actual vertex objects (for your project: Colony objects)
+    // Stores the actual vertex objects (Colony objects)
     protected List<V> vertices = new ArrayList<>();
 
     // Adjacency list: each vertex index has a list of weighted edges
@@ -112,15 +112,104 @@ public class WeightedGraph<V> implements Graph<V> {
 
     @Override
     public void printEdges() {
-        for (int u = 0; u < neighbors.size(); u++) {
-            System.out.print(getVertex(u) + " (" + u + "): ");
+        System.out.println("\n==========================================");
+        System.out.println("ADJACENCY LIST");
+        System.out.println("==========================================");
 
-            for (WeightedEdge edge : neighbors.get(u)) {
-                System.out.print("(" + edge.source + ", " +
-                        edge.destination + ", " + edge.weight + ") ");
+        for (int i = 0; i < neighbors.size(); i++) {
+            // We use getName() by casting to Colony,
+            // or just use getVertex(i) if you want the full details
+            Colony c = (Colony)getVertex(i);
+            System.out.println("Node [" + i + "] " + c.getName() + ":");
+
+            for (WeightedEdge edge : neighbors.get(i)) {
+                Colony dest = (Colony)getVertex(edge.destination);
+                System.out.printf("  --> Connects to: %-10s | Distance: %.2f units\n",
+                        dest.getName(), edge.weight);
+            }
+            System.out.println("------------------------------------------");
+        }
+    }
+
+    /** Clear the entire graph */
+    public void clear() {
+        vertices.clear();
+        neighbors.clear();
+    }
+
+    /** Find single source shortest paths */
+    public ShortestPathTree getShortestPath(int sourceVertex) {
+        // cost[v] stores the cost of the path from v to the source
+        double[] cost = new double[getSize()];
+        for (int i = 0; i < cost.length; i++) {
+            cost[i] = Double.POSITIVE_INFINITY; // Initial cost set to infinity
+        }
+        cost[sourceVertex] = 0; // Cost of source is 0
+
+        // parent[v] stores the previous vertex of v in the path
+        int[] parent = new int[getSize()];
+        parent[sourceVertex] = -1; // The parent of source is set to -1
+
+        // T stores the vertices whose path found so far
+        List<Integer> T = new ArrayList<>();
+
+        // Expand T
+        while (T.size() < getSize()) {
+            // Find smallest cost v in V - T
+            int u = -1; // Vertex to be determined
+            double currentMinCost = Double.POSITIVE_INFINITY;
+            for (int i = 0; i < getSize(); i++) {
+                if (!T.contains(i) && cost[i] < currentMinCost) {
+                    currentMinCost = cost[i];
+                    u = i;
+                }
             }
 
-            System.out.println();
+            if (u == -1) break; else T.add(u); // Add a new vertex to T
+
+            // Adjust cost[v] for v that is adjacent to u and v in V - T
+            for (WeightedEdge e : neighbors.get(u)) {
+                if (!T.contains(e.destination) && cost[e.destination] > cost[u] + e.weight) {
+                    cost[e.destination] = cost[u] + e.weight;
+                    parent[e.destination] = u;
+                }
+            }
+        } // End of while
+
+        // Create a ShortestPathTree
+        return new ShortestPathTree(sourceVertex, parent, T, cost);
+    }
+
+    /** Inner class for Shortest Path Results */
+    public class ShortestPathTree {
+        private int source;
+        private int[] parent;
+        private List<Integer> searchOrder;
+        private double[] cost;
+
+        public ShortestPathTree(int source, int[] parent, List<Integer> searchOrder, double[] cost) {
+            this.source = source;
+            this.parent = parent;
+            this.searchOrder = searchOrder;
+            this.cost = cost;
+        }
+
+        /** Return the cost for a path from the root to vertex v */
+        public double getCost(int v) {
+            return cost[v];
+        }
+
+        /** Recursively print the path of vertex2 v */
+        public void printPath(int v) {
+            // Cast to Colony to access getName()
+            Colony c = (Colony) vertices.get(v);
+
+            if (parent[v] == -1) {
+                System.out.print(c.getName());
+            } else {
+                printPath(parent[v]);
+                System.out.print(" -> " + c.getName());
+            }
         }
     }
 
@@ -128,7 +217,6 @@ public class WeightedGraph<V> implements Graph<V> {
     public MST getMinimumSpanningTree() {
         return getMinimumSpanningTree(0);
     }
-
 
     public MST getMinimumSpanningTree(int startingVertex) {
         double[] cost = new double[getSize()];
@@ -191,9 +279,8 @@ public class WeightedGraph<V> implements Graph<V> {
             this.totalWeight = totalWeight;
         }
 
-    /** Clear the entire graph */
-    public void clear() {
-        vertices.clear();
-        neighbors.clear();
+        public double getTotalWeight() {
+            return totalWeight;
+        }
     }
 }
