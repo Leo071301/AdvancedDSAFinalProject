@@ -172,6 +172,54 @@ public class Tester {
         System.out.println("Manual Merge Sort Time: " + manualDuration + " ms");
         System.out.println("Java Collections.sort() Time: " + javaDuration + " ms");
         System.out.println("Difference: " + (manualDuration - javaDuration) + " ms");
+
+
+        // --- Phase 3: Weighted Graph Foundation ---
+        System.out.println("\n--- Section 7: Weighted Graph Foundation ---");
+
+        // Create more colonies so the graph has at least 6 vertices
+        Colony delta = new Colony("Delta", new Point2D.Double(20, 10), 2);
+        Colony epsilon = new Colony("Epsilon", new Point2D.Double(35, 25), 4);
+        Colony zeta = new Colony("Zeta", new Point2D.Double(60, 15), 2);
+
+        // Build the graph
+        WeightedGraph<Colony> graph = new WeightedGraph<>();
+
+        graph.addVertex(alpha);    // index 0
+        graph.addVertex(beta);     // index 1
+        graph.addVertex(gamma);    // index 2
+        graph.addVertex(delta);    // index 3
+        graph.addVertex(epsilon);  // index 4
+        graph.addVertex(zeta);     // index 5
+
+        // Add undirected weighted edges using location distance as weight
+        graph.addEdge(0, 2, alpha.getLocation().distance(gamma.getLocation()));
+        graph.addEdge(0, 3, alpha.getLocation().distance(delta.getLocation()));
+        graph.addEdge(2, 3, gamma.getLocation().distance(delta.getLocation()));
+        graph.addEdge(3, 4, delta.getLocation().distance(epsilon.getLocation()));
+        graph.addEdge(4, 1, epsilon.getLocation().distance(beta.getLocation()));
+        graph.addEdge(4, 5, epsilon.getLocation().distance(zeta.getLocation()));
+        graph.addEdge(1, 5, beta.getLocation().distance(zeta.getLocation()));
+
+        // Print the graph structure
+        System.out.println("Graph edges:");
+        graph.printEdges();
+
+        // Check neighbors of Alpha
+        System.out.println("\nNeighbors of Alpha:");
+        List<Integer> alphaNeighbors = graph.getNeighbors(graph.getIndex(alpha));
+        for (int neighborIndex : alphaNeighbors) {
+            System.out.println("- " + graph.getVertex(neighborIndex).getName());
+        }
+
+        // Check sample weights
+        System.out.println("\nSample edge weights:");
+        System.out.println("Alpha <-> Gamma: " + graph.getWeight(0, 2));
+        System.out.println("Delta <-> Epsilon: " + graph.getWeight(3, 4));
+        System.out.println("Beta <-> Zeta: " + graph.getWeight(1, 5));
+
+        // Verify graph size
+        System.out.println("\nTotal vertices in graph: " + graph.getSize());
     }
 
     // helper method for displaying resource counts
