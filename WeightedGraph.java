@@ -124,6 +124,73 @@ public class WeightedGraph<V> implements Graph<V> {
         }
     }
 
+    /** Get a minimum spanning tree rooted at vertex 0 */
+    public MST getMinimumSpanningTree() {
+        return getMinimumSpanningTree(0);
+    }
+
+
+    public MST getMinimumSpanningTree(int startingVertex) {
+        double[] cost = new double[getSize()];
+
+        // Initialize all costs to infinity
+        for (int i = 0; i < cost.length; i++) {
+            cost[i] = Double.POSITIVE_INFINITY;
+        }
+
+        cost[startingVertex] = 0; // Start here
+
+        int[] parent = new int[getSize()];
+        for (int i = 0; i < parent.length; i++) {
+            parent[i] = -1;
+        }
+
+        double totalWeight = 0;
+
+        List<Integer> T = new ArrayList<>(); // vertices in MST
+
+        while (T.size() < getSize()) {
+            int u = -1;
+            double currentMinCost = Double.POSITIVE_INFINITY;
+
+            // Find the vertex with smallest cost not yet in T
+            for (int i = 0; i < getSize(); i++) {
+                if (!T.contains(i) && cost[i] < currentMinCost) {
+                    currentMinCost = cost[i];
+                    u = i;
+                }
+            }
+
+            if (u == -1) break; // disconnected graph
+
+            T.add(u);
+            totalWeight += cost[u];
+
+            // Update neighbors
+            for (WeightedEdge e : neighbors.get(u)) {
+                int v = e.destination;
+
+                if (!T.contains(v) && cost[v] > e.weight) {
+                    cost[v] = e.weight;
+                    parent[v] = u;
+                }
+            }
+        }
+
+        return new MST(startingVertex, parent, totalWeight);
+    }
+
+    public class MST {
+        private int root;
+        private int[] parent;
+        private double totalWeight;
+
+        public MST(int root, int[] parent, double totalWeight) {
+            this.root = root;
+            this.parent = parent;
+            this.totalWeight = totalWeight;
+        }
+
     /** Clear the entire graph */
     public void clear() {
         vertices.clear();
