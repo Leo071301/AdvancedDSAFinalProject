@@ -220,6 +220,18 @@ public class Tester {
 
         // Verify graph size
         System.out.println("\nTotal vertices in graph: " + graph.getSize());
+
+        // --- Section 8: Minimum Spanning Tree (Prim's) ---
+        System.out.println("\n--- Section 8: Minimum Spanning Tree (Prim's) ---");
+
+        // Run Prim starting from Alpha (index 0)
+        WeightedGraph<Colony>.MST mst = graph.getMinimumSpanningTree();
+
+        // Print the MST
+        mst.printTree();
+
+        // Optional: explicitly print total weight again for clarity
+        System.out.println("Verified Total Weight: " + mst.getTotalWeight());
     }
 
     // helper method for displaying resource counts
