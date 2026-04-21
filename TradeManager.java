@@ -3,11 +3,13 @@ import java.util.*;
 public class TradeManager {
 
     private Queue<TradeRequest> openRequests = new LinkedList<>();
-    private HashMap<String, Colony> colonyMap = new HashMap<>();
+    private HashMap<String, Colony> colonyMap = new HashMap<>(); // Hashmap: direct access in O(1) time
+    // AVLTree: ordered lookup for sorted traversal in O(log n) time
+    private AVLTree<Colony> colonyTree = new AVLTree<>();
 
     public void addColony(Colony colony) { // Add colony through ID string
         colonyMap.put(colony.getId(), colony);
-        // colonyTree.insert(colony); for ordered lookup with AVLTree when it is implemented
+        colonyTree.insert(colony);
     }
 
     public Colony getColony(String id) { // Find colony in O(1) time
@@ -18,8 +20,17 @@ public class TradeManager {
         openRequests.add(trade);
     }
 
-    public void removeColony(Colony colony) { // Remove colony from the hash map
-        colonyMap.remove(colony.getId());
+    public void removeColony(Colony colony) {
+        colonyMap.remove(colony.getId()); // Remove colony from the hash map
+        colonyTree.delete(colony); // Remove colony from the AVL Tree
+    }
+
+    public boolean isColonyinSystem(Colony colony) {
+        return colonyTree.search(colony);
+    }
+
+    public void displayColonies() {
+        colonyTree.inorder();
     }
 
     public boolean matchTrades(){
@@ -63,6 +74,8 @@ public class TradeManager {
 
         // O(log n) search to find where requester is in sorted list
         Colony foundRequester = colonyMap.get(requester.getId());
+
+        if  (foundRequester == null){ return eligibleCandidates; }
 
         for (Colony colony : colonyMap.values()) {
             // Skip the requester colony
