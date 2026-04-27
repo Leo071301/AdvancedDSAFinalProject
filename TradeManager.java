@@ -190,6 +190,20 @@ public class TradeManager {
 
         // Generate the MST starting from the first colony in the graph
         WeightedGraph<Colony>.MST mst = logisticsGraph.getMinimumSpanningTree(0);
+        int[] parent = mst.getParent();
+
+        // Output the specific edges selected
+        for (int i = 0; i < parent.length; i++) {
+            if (parent[i] != -1) { // -1 is the root, all others have a parent edge
+                Colony current = logisticsGraph.getVertex(i);
+                Colony p = logisticsGraph.getVertex(parent[i]);
+                double weight = logisticsGraph.getWeight(parent[i], i);
+
+                // This prints the specific road connection and its cost
+                System.out.printf("  [Route] %-10s <---> %-10s | Distance: %.2f km\n",
+                        p.getName(), current.getName(), weight);
+            }
+        }
 
         return mst.getTotalWeight();
     }
