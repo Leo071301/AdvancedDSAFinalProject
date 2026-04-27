@@ -84,7 +84,7 @@ public class Tester {
 
         // --- SECTION 3: MINIMUM SPANNING TREE (PRIM'S) ---
         System.out.println("\n--- Section 3: Minimum Spanning Tree (Prim's Algorithm) ---");
-        System.out.println("To ensure all colonies can trade, a minimum of "
+        System.out.println("\nTo ensure all colonies can trade, a minimum of "
                 + String.format("%.2f", manager.reportMinimumRoadDistance()) + " km of road must be secured.");
         System.out.println("Note: This connects all colonies with the lowest total infrastructure cost.");
 
