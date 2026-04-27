@@ -179,4 +179,21 @@ public class TradeManager {
         // You can either throw or return template.copy() and accept amount mismatch risk
         throw new IllegalArgumentException("Unsupported resource subclass: " + template.getClass().getName());
     }
+
+    /** Calculate the absolute minimum road distance required to keep
+     every colony in the Wasteland Exchange connected. */
+    public void reportMinimumRoadDistance() {
+        if (logisticsGraph == null || logisticsGraph.getSize() < 2) {
+            System.out.println("Insufficient data to calculate network connectivity.");
+            return;
+        }
+
+        // Generate the MST starting from the first colony in the graph
+        WeightedGraph<Colony>.MST mst = logisticsGraph.getMinimumSpanningTree(0);
+        double minDistance = mst.getTotalWeight();
+
+        System.out.println("\n--- INFRASTRUCTURE & CONNECTIVITY REPORT ---");
+        System.out.println("To ensure all colonies can trade, a minimum of "
+                + String.format("%.2f", minDistance) + " km of road must be secured.");
+    }
 }
