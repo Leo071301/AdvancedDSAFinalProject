@@ -67,6 +67,9 @@ public class Tester {
         graph.addEdge(4, 5, epsilon.getLocation().distance(zeta.getLocation()));
         graph.addEdge(1, 5, beta.getLocation().distance(zeta.getLocation()));
 
+        // Connect graph to the manager so it can use Dijkstra for compatibility
+        manager.setLogisticsGraph(graph);
+
         System.out.println("Logistics Network Map:");
         graph.printEdges();
 
