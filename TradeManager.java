@@ -182,18 +182,15 @@ public class TradeManager {
 
     /** Calculate the absolute minimum road distance required to keep
      every colony in the Wasteland Exchange connected. */
-    public void reportMinimumRoadDistance() {
+    public double reportMinimumRoadDistance() {
         if (logisticsGraph == null || logisticsGraph.getSize() < 2) {
             System.out.println("Insufficient data to calculate network connectivity.");
-            return;
+            return 0.0;
         }
 
         // Generate the MST starting from the first colony in the graph
         WeightedGraph<Colony>.MST mst = logisticsGraph.getMinimumSpanningTree(0);
-        double minDistance = mst.getTotalWeight();
 
-        System.out.println("\n--- INFRASTRUCTURE & CONNECTIVITY REPORT ---");
-        System.out.println("To ensure all colonies can trade, a minimum of "
-                + String.format("%.2f", minDistance) + " km of road must be secured.");
+        return mst.getTotalWeight();
     }
 }
