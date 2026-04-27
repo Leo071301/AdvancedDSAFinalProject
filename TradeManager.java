@@ -6,6 +6,11 @@ public class TradeManager {
     private HashMap<String, Colony> colonyMap = new HashMap<>(); // Hashmap: direct access in O(1) time
     // AVLTree: ordered lookup for sorted traversal in O(log n) time
     private AVLTree<Colony> colonyTree = new AVLTree<>();
+    private WeightedGraph<Colony> logisticsGraph; // logistics graph for Djikstra lookups
+
+    public void setLogisticsGraph(WeightedGraph<Colony> logisticsGraph) {
+        this.logisticsGraph = logisticsGraph;
+    }
 
     public void addColony(Colony colony) { // Add colony through ID string
         colonyMap.put(colony.getId(), colony);
@@ -92,9 +97,14 @@ public class TradeManager {
     }
 
     private Comparator<Colony> colonyScoreComparator(Colony requester){
+
+        // generate the shortest path tree for the requester
+        int sourceIndex = logisticsGraph.getIndex(requester);
+        WeightedGraph<Colony>.ShortestPathTree pathTree = logisticsGraph.getShortestPath(sourceIndex);
+
         return (c1, c2) -> {
-            double score1 = compatabilityScore(requester, c1);
-            double score2 = compatabilityScore(requester, c2);
+            double score1 = compatabilityScore(pathTree, c1);
+            double score2 = compatabilityScore(pathTree, c2);
             return Double.compare(score2, score1);
         };
     }
@@ -134,8 +144,10 @@ public class TradeManager {
         return true;
     }
 
-    private double compatabilityScore(Colony requester, Colony provider){
-        double distance = requester.getLocation().distance(provider.getLocation());
+    private double compatabilityScore(WeightedGraph<Colony>.ShortestPathTree pathTree, Colony provider){
+        int destinationIndex = logisticsGraph.getIndex(provider);
+        double graphDistance = pathTree.getCost(destinationIndex);
+
         int risk = provider.getRiskFactor();
 
         // tunable weights
@@ -144,7 +156,7 @@ public class TradeManager {
 
         // convert safety + distance
         double safetyScore = (6 - risk);
-        double distanceScore = 1.0 / (1.0 + distance);
+        double distanceScore = 1.0 / (1.0 + graphDistance);
 
         return (riskWeight * safetyScore) + (distanceWeight * distanceScore);
     }
