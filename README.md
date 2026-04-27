@@ -17,7 +17,7 @@ Features:
 - Implements an AVL Tree for balanced indexing (O(log n))
 - Models colony relationships using a weighted graph (adjacency list)
 - Uses Prim’s Algorithm to generate a Minimum Spanning Tree (MST)
-- Uses Dijkstra’s Algorithm for shortest paths (if implemented)
+- Uses Dijkstra’s Algorithm for shortest paths
 
 File Structure:
 - Colony.java – Manages colony data and inventory
@@ -50,6 +50,7 @@ The program demonstrates:
 - Hashing and identity verification
 - Graph construction and visualization
 - Minimum Spanning Tree generation
+- Integrates MST and shortest path into trade logic
 
 Limitations:
 - Only one resource type per request
@@ -57,7 +58,6 @@ Limitations:
 - Graph assumes all colonies are connected
 
 Future Implementations:
-- Integrate MST and shortest path into trade logic
 - Improve graph output formatting
 - Add persistent storage (file/database)
 - Expand trade matching criteria
