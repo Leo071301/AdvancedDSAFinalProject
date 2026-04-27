@@ -41,32 +41,6 @@ public class SearchSortUtils {
         return merged;
     }
 
-    //partitions list based on the last element
-    private static <T> int partition(ArrayList<T> list, int low, int high, Comparator<? super T> comparator){
-        T pivot = list.get(high);
-        int indx = (low -1);
-
-        for(int i = low; i < high; i++){
-            // checks current element against pivot
-            //current sorting in descending order(Z-A)
-            //change >= to <= to be ascending(A-Z)
-            if(comparator.compare(list.get(i),pivot) >= 0){
-                 indx += 1;
-                 swap(list, indx, i);
-            }
-        }
-        swap(list, indx+1, high);
-        return indx+1;
-    }
-
-    //helper method to swap items in list
-    private static <T> void swap(ArrayList<T> list, int i, int k){
-        T temp = list.get(i);
-        list.set(i, list.get(k));
-        list.set(k, temp);
-    }
-
-
     // --- BINARY SEARCH BY RESOURCE ---
     public static <T extends Resource> int binarySearchResource(ArrayList<T> list, String targetName, Class<?> targetClass) {
         return recursiveBinarySearchResource(list, targetName, targetClass, 0, list.size() - 1);
