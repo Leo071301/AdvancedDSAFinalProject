@@ -282,5 +282,9 @@ public class WeightedGraph<V> implements Graph<V> {
         public double getTotalWeight() {
             return totalWeight;
         }
+
+        public int[] getParent() {
+            return parent;
+        }
     }
 }
